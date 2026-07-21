@@ -170,19 +170,23 @@ function locationScore(location, query) {
   }
 
   if (settlementTypes.has(locationType)) {
-    score += 80;
+    score += 110;
   }
 
   if (locationClass === "place") {
-    score += 35;
+    score += 55;
   }
 
   if (locationClass === "boundary" || administrativeTypes.has(locationType)) {
-    score -= 70;
+    score -= 110;
   }
 
   if (location.address?.city || location.address?.town || location.address?.village || location.address?.hamlet) {
-    score += 45;
+    score += 70;
+  }
+
+  if ((location.address?.city || location.address?.town) && primaryName === cleanQuery) {
+    score += 80;
   }
 
   return score;
@@ -323,7 +327,43 @@ async function copyText(value, successKey) {
   }
 }
 
-function renderLocation(location) {
+function sameLocation(left, right) {
+  return String(left.place_id || "") === String(right.place_id || "")
+    || `${left.lat},${left.lon}` === `${right.lat},${right.lon}`;
+}
+
+function renderAlternatives(selectedLocation, alternatives) {
+  const uniqueAlternatives = alternatives
+    .filter((location) => !sameLocation(location, selectedLocation))
+    .slice(0, 5);
+
+  if (!uniqueAlternatives.length) {
+    return null;
+  }
+
+  const card = document.createElement("article");
+  card.className = "alternatives-card";
+  const title = document.createElement("h3");
+  title.textContent = messages.maybeOtherPlace;
+  const list = document.createElement("div");
+  list.className = "alternative-list";
+
+  uniqueAlternatives.forEach((location) => {
+    const option = document.createElement("button");
+    option.className = "alternative-option";
+    option.type = "button";
+    option.textContent = location.display_name;
+    option.addEventListener("click", () => {
+      renderLocation(location, uniqueAlternatives);
+    });
+    list.append(option);
+  });
+
+  card.append(title, list);
+  return card;
+}
+
+function renderLocation(location, alternatives = []) {
   currentLocation = location;
   const coordinates = formatCoordinates(location.lat, location.lon);
   const card = document.createElement("article");
@@ -369,7 +409,8 @@ function renderLocation(location) {
   });
 
   card.append(title, meta, actions);
-  results.replaceChildren(card);
+  const alternativesCard = renderAlternatives(location, alternatives);
+  results.replaceChildren(...[card, alternativesCard].filter(Boolean));
   setMapView(location.lat, location.lon);
 }
 
@@ -539,10 +580,7 @@ async function searchPlace(query) {
       stateCard("noResultsFound", "checkPlaceNameOrAddress");
       return;
     }
-    renderLocation(locations[0]);
-    if (locations.length > 1) {
-      renderDuplicates(locations);
-    }
+    renderLocation(locations[0], locations);
   } catch {
     showStatus("unableToLoadMap");
     stateCard("unableToLoadMap", "checkPlaceNameOrAddress");

@@ -142,5 +142,8 @@
   },
   "close": {
     "message": "Close"
+  },
+  "maybeOtherPlace": {
+    "message": "Maybe you meant another place"
   }
 }

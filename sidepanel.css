@@ -267,7 +267,8 @@ body {
 
 .state-card,
 .result-card,
-.location-card {
+.location-card,
+.alternatives-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -329,6 +330,42 @@ body {
   white-space: normal;
   min-height: 42px;
   line-height: 1.15;
+}
+
+.alternatives-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.alternatives-card h3 {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.alternative-list {
+  display: grid;
+  gap: 8px;
+}
+
+.alternative-option {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-secondary);
+  color: var(--text-primary);
+  padding: 11px 12px;
+  text-align: left;
+  line-height: 1.25;
+  transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+.alternative-option:hover {
+  border-color: color-mix(in srgb, var(--accent) 34%, var(--border));
+  background: var(--accent-soft);
+  transform: translateY(-1px);
 }
 
 .duplicates {
