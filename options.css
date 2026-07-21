@@ -1,15 +1,16 @@
 @import url("./theme.css");
 
 .settings-shell {
-  width: min(760px, 100%);
+  width: min(1040px, 100%);
   margin: 0 auto;
-  padding: 28px 18px;
+  padding: 28px 22px;
 }
 
 .settings-header {
+  width: min(720px, 100%);
   display: grid;
-  gap: 10px;
-  margin-bottom: 22px;
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
 .settings-header p {
@@ -21,22 +22,24 @@
 
 .settings-form {
   display: grid;
-  gap: 16px;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  align-items: start;
 }
 
 .settings-card {
   display: grid;
-  gap: 16px;
-  padding: 18px;
+  gap: 18px;
+  padding: 22px;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 22px;
   background: var(--surface);
   box-shadow: var(--control-shadow);
 }
 
 .settings-card h2 {
   margin: 0;
-  font-size: 18px;
+  font-size: 19px;
   letter-spacing: 0;
 }
 
@@ -105,6 +108,24 @@
 @media (min-width: 680px) {
   .settings-form {
     grid-template-columns: 1fr 1fr;
-    align-items: start;
+  }
+
+  .settings-card-wide {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .settings-card-wide h2 {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 520px) {
+  .settings-shell {
+    padding: 20px 14px;
+  }
+
+  .settings-card {
+    padding: 18px;
   }
 }

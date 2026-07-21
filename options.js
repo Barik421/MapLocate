@@ -1,4 +1,4 @@
-import { applyTheme, detectLanguage, getSettings, localizeDocument, loadMessages, watchSystemTheme } from "./shared.js";
+import { applyTheme, getSettings, localizeDocument, loadMessages, watchSystemTheme } from "./shared.js";
 
 const form = document.querySelector("#settingsForm");
 const languageSelect = document.querySelector("#languageSelect");
@@ -14,7 +14,7 @@ async function hydrate() {
   await applyTheme(settings.theme);
   await localizeDocument();
 
-  languageSelect.value = settings.language === "auto" ? detectLanguage() : settings.language;
+  languageSelect.value = settings.language;
   themeSelect.value = settings.theme;
   defaultCountry.value = settings.defaultCountry;
   preferredRegion.value = settings.preferredRegion;
@@ -37,7 +37,7 @@ async function saveForm() {
 
 languageSelect.addEventListener("change", async () => {
   await saveForm();
-  await loadMessages(languageSelect.value);
+  await loadMessages(languageSelect.value === "auto" ? undefined : languageSelect.value);
   await localizeDocument();
 });
 

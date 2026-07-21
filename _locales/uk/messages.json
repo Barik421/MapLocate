@@ -119,6 +119,9 @@
   "languageEn": {
     "message": "English"
   },
+  "languageAuto": {
+    "message": "Як у Chrome"
+  },
   "settingsIntro": {
     "message": "Налаштуйте MapLocate для місць, які шукаєте найчастіше."
   },

@@ -171,7 +171,7 @@ function primaryLocationName(location) {
     || String(location.display_name || "").split(",")[0];
 }
 
-function knownPopulationScore(name) {
+function knownCityScore(name) {
   const scores = {
     "київ": 5000, "kyiv": 5000, "kiev": 5000,
     "харків": 4400, "kharkiv": 4400,
@@ -201,6 +201,27 @@ function knownPopulationScore(name) {
   return scores[normalizeSearchText(name)] || 0;
 }
 
+function isKnownMajorCityResult(location, query) {
+  const cleanQuery = normalizeSearchText(query);
+  const address = location.address || {};
+  const primaryName = normalizeSearchText(primaryLocationName(location));
+  const cityName = normalizeSearchText(address.city || address.town || "");
+  const state = normalizeSearchText(address.state || address.region || address.province || "");
+  const municipality = normalizeSearchText(address.municipality || "");
+  const displayName = normalizeSearchText(location.display_name);
+  const cityScore = knownCityScore(cleanQuery);
+
+  if (!cityScore || primaryName !== cleanQuery) {
+    return false;
+  }
+
+  if (cityName === cleanQuery) {
+    return true;
+  }
+
+  return state.includes(cleanQuery) || municipality.includes(cleanQuery) || displayName.includes(`${cleanQuery} міська громада`);
+}
+
 function locationScore(location, query) {
   const cleanQuery = normalizeSearchText(query);
   const displayName = normalizeSearchText(location.display_name);
@@ -209,7 +230,7 @@ function locationScore(location, query) {
   const locationClass = normalizeSearchText(location.class);
   const settlementTypes = new Set(["city", "town", "village", "hamlet", "municipality", "suburb", "neighbourhood"]);
   const administrativeTypes = new Set(["administrative", "state", "region", "county", "province", "oblast"]);
-  let score = knownPopulationScore(primaryName);
+  let score = isKnownMajorCityResult(location, query) ? knownCityScore(cleanQuery) : 0;
 
   if (primaryName === cleanQuery) {
     score += 120;
@@ -238,7 +259,7 @@ function locationScore(location, query) {
   }
 
   if (location.address?.village || location.address?.hamlet) {
-    score += 45;
+    score -= 140;
   }
 
   if ((location.address?.city || location.address?.town) && primaryName === cleanQuery) {

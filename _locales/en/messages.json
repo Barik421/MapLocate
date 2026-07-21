@@ -119,6 +119,9 @@
   "languageEn": {
     "message": "English"
   },
+  "languageAuto": {
+    "message": "Same as Chrome"
+  },
   "settingsIntro": {
     "message": "Tune MapLocate for the places you search most."
   },

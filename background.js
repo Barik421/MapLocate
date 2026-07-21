@@ -77,7 +77,7 @@ function primaryLocationName(location) {
     || String(location.display_name || "").split(",")[0];
 }
 
-function knownPopulationScore(name) {
+function knownCityScore(name) {
   const scores = {
     "київ": 5000, "kyiv": 5000, "kiev": 5000,
     "харків": 4400, "kharkiv": 4400,
@@ -107,6 +107,27 @@ function knownPopulationScore(name) {
   return scores[normalizeSearchText(name)] || 0;
 }
 
+function isKnownMajorCityResult(location, query) {
+  const cleanQuery = normalizeSearchText(query);
+  const address = location.address || {};
+  const primaryName = normalizeSearchText(primaryLocationName(location));
+  const cityName = normalizeSearchText(address.city || address.town || "");
+  const state = normalizeSearchText(address.state || address.region || address.province || "");
+  const municipality = normalizeSearchText(address.municipality || "");
+  const displayName = normalizeSearchText(location.display_name);
+  const cityScore = knownCityScore(cleanQuery);
+
+  if (!cityScore || primaryName !== cleanQuery) {
+    return false;
+  }
+
+  if (cityName === cleanQuery) {
+    return true;
+  }
+
+  return state.includes(cleanQuery) || municipality.includes(cleanQuery) || displayName.includes(`${cleanQuery} міська громада`);
+}
+
 function locationScore(location, query) {
   const cleanQuery = normalizeSearchText(query);
   const primaryName = normalizeSearchText(primaryLocationName(location));
@@ -114,7 +135,7 @@ function locationScore(location, query) {
   const locationType = normalizeSearchText(location.type);
   const locationClass = normalizeSearchText(location.class);
   const settlementTypes = new Set(["city", "town", "village", "hamlet", "municipality", "suburb", "neighbourhood"]);
-  let score = knownPopulationScore(primaryName);
+  let score = isKnownMajorCityResult(location, query) ? knownCityScore(cleanQuery) : 0;
 
   if (primaryName === cleanQuery) score += 500;
   if (primaryName.startsWith(cleanQuery)) score += 160;
@@ -123,7 +144,7 @@ function locationScore(location, query) {
   if (locationClass === "place") score += 180;
   if (locationClass === "boundary" || locationType === "administrative") score -= 420;
   if (location.address?.city || location.address?.town) score += 260;
-  if (location.address?.village || location.address?.hamlet) score += 45;
+  if (location.address?.village || location.address?.hamlet) score -= 140;
   return score;
 }
 
