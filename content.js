@@ -45,6 +45,13 @@ function removePopover() {
   document.getElementById(POPOVER_ID)?.remove();
 }
 
+function clearSelectionUi() {
+  clearTimeout(hideTimer);
+  removeButton();
+  removePopover();
+  window.getSelection()?.removeAllRanges();
+}
+
 function scheduleHide() {
   clearTimeout(hideTimer);
   hideTimer = setTimeout(removeButton, 4500);
@@ -202,6 +209,22 @@ function showQuickInfo(info, anchorRect = null) {
 document.addEventListener("selectionchange", () => {
   clearTimeout(hideTimer);
   setTimeout(showButton, 80);
+});
+
+document.addEventListener("pointerdown", (event) => {
+  if (event.target.closest(`#${BUTTON_ID}, #${POPOVER_ID}`)) {
+    return;
+  }
+
+  if (getSelectedText()) {
+    clearSelectionUi();
+  }
+}, true);
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    clearSelectionUi();
+  }
 });
 
 window.addEventListener("scroll", () => {
