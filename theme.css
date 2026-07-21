@@ -114,8 +114,7 @@ select {
   flex: 0 0 auto;
   border-radius: 10px;
   background:
-    linear-gradient(90deg, transparent 31%, color-mix(in srgb, var(--accent) 18%, transparent) 32% 36%, transparent 37%),
-    linear-gradient(0deg, transparent 58%, color-mix(in srgb, var(--accent) 18%, transparent) 59% 63%, transparent 64%),
+    linear-gradient(90deg, transparent 31%, color-mix(in srgb, var(--text-secondary) 18%, transparent) 32% 36%, transparent 37%),
     var(--surface);
   border: 1px solid var(--border);
   box-shadow: 0 8px 18px var(--accent-soft), inset 0 0 0 1px rgba(255, 255, 255, 0.35);
