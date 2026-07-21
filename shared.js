@@ -3,7 +3,9 @@ const STORAGE_DEFAULTS = {
   theme: "system",
   defaultCountry: "",
   preferredRegion: "",
-  referenceCity: ""
+  referenceCity: "",
+  selectionButtonEnabled: true,
+  selectionActionMode: "sidePanel"
 };
 
 let cachedMessages = null;

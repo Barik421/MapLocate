@@ -51,6 +51,21 @@
             <input id="referenceCity" name="referenceCity" type="text" data-i18n-placeholder="cityPlaceholder">
           </label>
         </section>
+
+        <section class="settings-card">
+          <h2 data-i18n="selectionBehavior"></h2>
+          <label class="toggle-field">
+            <input id="selectionButtonEnabled" name="selectionButtonEnabled" type="checkbox">
+            <span data-i18n="showSelectionButton"></span>
+          </label>
+          <label class="field">
+            <span data-i18n="selectionAction"></span>
+            <select id="selectionActionMode" name="selectionActionMode">
+              <option value="sidePanel" data-i18n="openSidePanel"></option>
+              <option value="quickInfo" data-i18n="quickInfo"></option>
+            </select>
+          </label>
+        </section>
       </form>
 
       <p class="save-note" data-i18n="saveAutomatically"></p>

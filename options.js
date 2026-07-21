@@ -6,6 +6,8 @@ const themeSelect = document.querySelector("#themeSelect");
 const defaultCountry = document.querySelector("#defaultCountry");
 const preferredRegion = document.querySelector("#preferredRegion");
 const referenceCity = document.querySelector("#referenceCity");
+const selectionButtonEnabled = document.querySelector("#selectionButtonEnabled");
+const selectionActionMode = document.querySelector("#selectionActionMode");
 
 async function hydrate() {
   const settings = await getSettings();
@@ -17,6 +19,8 @@ async function hydrate() {
   defaultCountry.value = settings.defaultCountry;
   preferredRegion.value = settings.preferredRegion;
   referenceCity.value = settings.referenceCity;
+  selectionButtonEnabled.checked = settings.selectionButtonEnabled;
+  selectionActionMode.value = settings.selectionActionMode;
 }
 
 async function saveForm() {
@@ -25,7 +29,9 @@ async function saveForm() {
     theme: themeSelect.value,
     defaultCountry: defaultCountry.value.trim(),
     preferredRegion: preferredRegion.value.trim(),
-    referenceCity: referenceCity.value.trim()
+    referenceCity: referenceCity.value.trim(),
+    selectionButtonEnabled: selectionButtonEnabled.checked,
+    selectionActionMode: selectionActionMode.value
   });
 }
 
@@ -41,6 +47,10 @@ themeSelect.addEventListener("change", async () => {
 });
 
 form.addEventListener("input", () => {
+  saveForm();
+});
+
+form.addEventListener("change", () => {
   saveForm();
 });
 

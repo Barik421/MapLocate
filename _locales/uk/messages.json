@@ -145,5 +145,32 @@
   },
   "maybeOtherPlace": {
     "message": "Можливо, ви мали на увазі інший населений пункт"
+  },
+  "selectionBehavior": {
+    "message": "Поведінка виділення"
+  },
+  "showSelectionButton": {
+    "message": "Показувати кнопку після виділення тексту"
+  },
+  "selectionAction": {
+    "message": "Дія кнопки"
+  },
+  "openSidePanel": {
+    "message": "Відкрити бокову панель"
+  },
+  "quickInfo": {
+    "message": "Показати швидку довідку"
+  },
+  "region": {
+    "message": "Область"
+  },
+  "district": {
+    "message": "Район"
+  },
+  "openInGoogleSearch": {
+    "message": "Відкрити в Google"
+  },
+  "placeInfoUnavailable": {
+    "message": "Не вдалося знайти дані про місце"
   }
 }

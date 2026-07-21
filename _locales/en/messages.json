@@ -145,5 +145,32 @@
   },
   "maybeOtherPlace": {
     "message": "Maybe you meant another place"
+  },
+  "selectionBehavior": {
+    "message": "Selection behavior"
+  },
+  "showSelectionButton": {
+    "message": "Show button after text selection"
+  },
+  "selectionAction": {
+    "message": "Button action"
+  },
+  "openSidePanel": {
+    "message": "Open side panel"
+  },
+  "quickInfo": {
+    "message": "Show quick info"
+  },
+  "region": {
+    "message": "Region"
+  },
+  "district": {
+    "message": "District"
+  },
+  "openInGoogleSearch": {
+    "message": "Open in Google"
+  },
+  "placeInfoUnavailable": {
+    "message": "Could not find location details"
   }
 }

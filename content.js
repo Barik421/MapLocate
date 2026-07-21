@@ -1,8 +1,33 @@
 const BUTTON_ID = "maplocate-selection-button";
+const POPOVER_ID = "maplocate-info-popover";
 const MIN_SELECTION_LENGTH = 2;
 
 let selectionButton = null;
 let hideTimer = null;
+let settings = {
+  selectionButtonEnabled: true,
+  selectionActionMode: "sidePanel"
+};
+
+chrome.storage.sync.get(settings).then((stored) => {
+  settings = { ...settings, ...stored };
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "sync") {
+    return;
+  }
+  if (changes.selectionButtonEnabled) {
+    settings.selectionButtonEnabled = changes.selectionButtonEnabled.newValue;
+    if (!settings.selectionButtonEnabled) {
+      removeButton();
+      removePopover();
+    }
+  }
+  if (changes.selectionActionMode) {
+    settings.selectionActionMode = changes.selectionActionMode.newValue;
+  }
+});
 
 function getSelectedText() {
   const selection = window.getSelection();
@@ -14,6 +39,10 @@ function removeButton() {
     selectionButton.remove();
     selectionButton = null;
   }
+}
+
+function removePopover() {
+  document.getElementById(POPOVER_ID)?.remove();
 }
 
 function scheduleHide() {
@@ -57,11 +86,24 @@ function createButton() {
       removeButton();
       return;
     }
-    await chrome.runtime.sendMessage({
-      type: "MAPLOCATE_FIND_SELECTION",
-      query
-    });
-    removeButton();
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: "MAPLOCATE_FIND_SELECTION",
+        query,
+        actionMode: settings.selectionActionMode
+      });
+      if (!response?.ok && settings.selectionActionMode === "quickInfo") {
+        showQuickInfo({
+          title: chrome.i18n.getMessage("placeInfoUnavailable"),
+          region: "",
+          district: "",
+          mapsUrl: "",
+          googleUrl: ""
+        }, button.getBoundingClientRect());
+      }
+    } finally {
+      removeButton();
+    }
   });
   button.addEventListener("mouseenter", () => clearTimeout(hideTimer));
   button.addEventListener("mouseleave", scheduleHide);
@@ -69,6 +111,11 @@ function createButton() {
 }
 
 function showButton() {
+  if (!settings.selectionButtonEnabled) {
+    removeButton();
+    return;
+  }
+
   const query = getSelectedText();
   const rect = selectionRect();
   if (query.length < MIN_SELECTION_LENGTH || !rect) {
@@ -84,6 +131,72 @@ function showButton() {
   selectionButton.dataset.query = query;
   placeButton(rect);
   scheduleHide();
+}
+
+function quickInfoRow(labelKey, value) {
+  if (!value) {
+    return null;
+  }
+  const row = document.createElement("div");
+  row.className = "maplocate-info-row";
+  const label = document.createElement("span");
+  label.textContent = chrome.i18n.getMessage(labelKey);
+  const text = document.createElement("strong");
+  text.textContent = value;
+  row.append(label, text);
+  return row;
+}
+
+function actionLink(labelKey, url) {
+  if (!url) {
+    return null;
+  }
+  const link = document.createElement("a");
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = chrome.i18n.getMessage(labelKey);
+  return link;
+}
+
+function showQuickInfo(info, anchorRect = null) {
+  removePopover();
+  const popover = document.createElement("section");
+  popover.id = POPOVER_ID;
+
+  const closeButton = document.createElement("button");
+  closeButton.className = "maplocate-info-close";
+  closeButton.type = "button";
+  closeButton.setAttribute("aria-label", chrome.i18n.getMessage("close"));
+  closeButton.textContent = "×";
+  closeButton.addEventListener("click", removePopover);
+
+  const title = document.createElement("h2");
+  title.textContent = info.place || info.title;
+
+  const rows = [
+    quickInfoRow("region", info.region),
+    quickInfoRow("district", info.district)
+  ].filter(Boolean);
+
+  const actions = document.createElement("div");
+  actions.className = "maplocate-info-actions";
+  [
+    actionLink("openInGoogleMaps", info.mapsUrl),
+    actionLink("openInGoogleSearch", info.googleUrl)
+  ].filter(Boolean).forEach((link) => actions.append(link));
+
+  popover.append(closeButton, title, ...rows, actions);
+  document.documentElement.append(popover);
+
+  const rect = anchorRect || selectionRect();
+  const top = Math.max(8, window.scrollY + (rect?.bottom || 24) + 10);
+  const left = Math.min(
+    window.scrollX + (rect?.left || 12),
+    window.scrollX + document.documentElement.clientWidth - 326
+  );
+  popover.style.top = `${top}px`;
+  popover.style.left = `${Math.max(window.scrollX + 8, left)}px`;
 }
 
 document.addEventListener("selectionchange", () => {
@@ -102,3 +215,9 @@ window.addEventListener("scroll", () => {
 }, { passive: true });
 
 window.addEventListener("resize", removeButton);
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type === "MAPLOCATE_QUICK_INFO") {
+    showQuickInfo(message.info);
+  }
+});
