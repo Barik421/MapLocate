@@ -1,0 +1,146 @@
+{
+  "extensionName": {
+    "message": "MapLocate"
+  },
+  "extensionDescription": {
+    "message": "MapLocate helps users quickly find selected settlements, villages, cities and addresses on an interactive map."
+  },
+  "findOnMap": {
+    "message": "Find on map"
+  },
+  "openInGoogleMaps": {
+    "message": "Open in Google Maps"
+  },
+  "getDirections": {
+    "message": "Get directions"
+  },
+  "copyAddress": {
+    "message": "Copy address"
+  },
+  "copyCoordinates": {
+    "message": "Copy coordinates"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "language": {
+    "message": "Language"
+  },
+  "theme": {
+    "message": "Theme"
+  },
+  "light": {
+    "message": "Light"
+  },
+  "dark": {
+    "message": "Dark"
+  },
+  "system": {
+    "message": "System"
+  },
+  "defaultCountry": {
+    "message": "Default country"
+  },
+  "preferredRegion": {
+    "message": "Preferred region"
+  },
+  "referenceCity": {
+    "message": "Reference city"
+  },
+  "searchForPlace": {
+    "message": "Search for a place"
+  },
+  "noResultsFound": {
+    "message": "No results found"
+  },
+  "multipleLocationsFound": {
+    "message": "Multiple locations found"
+  },
+  "selectCorrectLocation": {
+    "message": "Select the correct location"
+  },
+  "unableToLoadMap": {
+    "message": "Unable to load the map"
+  },
+  "checkPlaceNameOrAddress": {
+    "message": "Check the place name or address"
+  },
+  "address": {
+    "message": "Address"
+  },
+  "coordinates": {
+    "message": "Coordinates"
+  },
+  "searching": {
+    "message": "Searching..."
+  },
+  "loadingMap": {
+    "message": "Loading map..."
+  },
+  "enterPlace": {
+    "message": "Enter a settlement, city, village or address"
+  },
+  "selectedTextEmpty": {
+    "message": "Select a place name or address first"
+  },
+  "addressCopied": {
+    "message": "Address copied"
+  },
+  "coordinatesCopied": {
+    "message": "Coordinates copied"
+  },
+  "copyFailed": {
+    "message": "Could not copy"
+  },
+  "mapAttribution": {
+    "message": "Map data © OpenStreetMap contributors"
+  },
+  "saveAutomatically": {
+    "message": "Changes are saved automatically"
+  },
+  "appearance": {
+    "message": "Appearance"
+  },
+  "locationPreferences": {
+    "message": "Location preferences"
+  },
+  "countryPlaceholder": {
+    "message": "Example: Ukraine"
+  },
+  "regionPlaceholder": {
+    "message": "Example: Lviv Oblast"
+  },
+  "cityPlaceholder": {
+    "message": "Example: Kyiv"
+  },
+  "languageUk": {
+    "message": "Українська"
+  },
+  "languageEn": {
+    "message": "English"
+  },
+  "settingsIntro": {
+    "message": "Tune MapLocate for the places you search most."
+  },
+  "openSettings": {
+    "message": "Open settings"
+  },
+  "suggestions": {
+    "message": "Suggestions"
+  },
+  "zoomIn": {
+    "message": "Zoom in"
+  },
+  "zoomOut": {
+    "message": "Zoom out"
+  },
+  "clearSearch": {
+    "message": "Clear search"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "close": {
+    "message": "Close"
+  }
+}

@@ -1,0 +1,65 @@
+@import url("./theme.css");
+
+.settings-shell {
+  width: min(760px, 100%);
+  margin: 0 auto;
+  padding: 28px 18px;
+}
+
+.settings-header {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.settings-header p {
+  margin: 0;
+  max-width: 520px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.settings-form {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--control-shadow);
+}
+
+.settings-card h2 {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field span {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.save-note {
+  margin: 16px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+@media (min-width: 680px) {
+  .settings-form {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}

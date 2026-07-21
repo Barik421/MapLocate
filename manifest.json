@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extensionName__",
+  "description": "__MSG_extensionDescription__",
+  "version": "1.0.0",
+  "default_locale": "en",
+  "permissions": [
+    "contextMenus",
+    "sidePanel",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://nominatim.openstreetmap.org/*",
+    "https://tile.openstreetmap.org/*",
+    "https://a.tile.openstreetmap.org/*",
+    "https://b.tile.openstreetmap.org/*",
+    "https://c.tile.openstreetmap.org/*",
+    "https://tiles.stadiamaps.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_title": "__MSG_extensionName__",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

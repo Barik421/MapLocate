@@ -1,0 +1,47 @@
+#maplocate-selection-button {
+  position: absolute;
+  z-index: 2147483647;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  max-width: 148px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #171717;
+  box-shadow: 0 12px 28px rgba(17, 17, 17, 0.18);
+  font: 650 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+#maplocate-selection-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(17, 17, 17, 0.22);
+}
+
+#maplocate-selection-button:active {
+  transform: translateY(0);
+}
+
+.maplocate-selection-pin {
+  position: relative;
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border-radius: 50% 50% 50% 4px;
+  background: #e53935;
+  transform: rotate(-45deg);
+}
+
+.maplocate-selection-pin::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+}

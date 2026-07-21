@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="sidepanel.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span class="brand-name" data-i18n="extensionName"></span>
+        </div>
+        <button class="icon-button" id="settingsButton" type="button" data-i18n-title="settings">
+          <svg class="icon-svg" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h4"></path>
+            <path d="M14 7h6"></path>
+            <path d="M4 17h6"></path>
+            <path d="M16 17h4"></path>
+            <circle cx="11" cy="7" r="3"></circle>
+            <circle cx="13" cy="17" r="3"></circle>
+          </svg>
+        </button>
+      </header>
+
+      <section class="search-panel">
+        <form class="search-form" id="searchForm">
+          <label class="sr-only" for="searchInput" data-i18n="searchForPlace"></label>
+          <div class="search-combo">
+            <div class="search-input-wrap">
+              <input id="searchInput" name="query" type="search" autocomplete="off" role="combobox" aria-expanded="false" aria-controls="suggestions" data-i18n-placeholder="searchForPlace">
+              <button class="clear-search-button" id="clearSearchButton" type="button" data-i18n-title="clearSearch">
+                <span></span>
+              </button>
+            </div>
+            <div id="suggestions" class="suggestions hidden" role="listbox" data-i18n-title="suggestions"></div>
+          </div>
+          <button class="primary-button" type="submit" data-i18n="findOnMap"></button>
+        </form>
+      </section>
+
+      <section class="map-wrap" aria-live="polite">
+        <div id="map" class="map"></div>
+        <div class="zoom-controls">
+          <button class="map-control" id="zoomInButton" type="button" data-i18n-title="zoomIn">+</button>
+          <button class="map-control" id="zoomOutButton" type="button" data-i18n-title="zoomOut">-</button>
+        </div>
+        <div id="mapStatus" class="map-status hidden" data-i18n="loadingMap"></div>
+        <div class="map-attribution" data-i18n="mapAttribution"></div>
+      </section>
+
+      <section id="results" class="results"></section>
+    </main>
+    <script type="module" src="sidepanel.js"></script>
+  </body>
+</html>

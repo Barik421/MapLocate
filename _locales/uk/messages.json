@@ -1,0 +1,146 @@
+{
+  "extensionName": {
+    "message": "MapLocate"
+  },
+  "extensionDescription": {
+    "message": "MapLocate допомагає швидко знаходити вибрані селища, села, міста й адреси на інтерактивній карті."
+  },
+  "findOnMap": {
+    "message": "Знайти на карті"
+  },
+  "openInGoogleMaps": {
+    "message": "Відкрити в Google Maps"
+  },
+  "getDirections": {
+    "message": "Побудувати маршрут"
+  },
+  "copyAddress": {
+    "message": "Скопіювати адресу"
+  },
+  "copyCoordinates": {
+    "message": "Скопіювати координати"
+  },
+  "settings": {
+    "message": "Налаштування"
+  },
+  "language": {
+    "message": "Мова"
+  },
+  "theme": {
+    "message": "Тема"
+  },
+  "light": {
+    "message": "Світла"
+  },
+  "dark": {
+    "message": "Темна"
+  },
+  "system": {
+    "message": "Як у системі"
+  },
+  "defaultCountry": {
+    "message": "Країна за замовчуванням"
+  },
+  "preferredRegion": {
+    "message": "Пріоритетна область"
+  },
+  "referenceCity": {
+    "message": "Основне місто"
+  },
+  "searchForPlace": {
+    "message": "Пошук населеного пункту"
+  },
+  "noResultsFound": {
+    "message": "Нічого не знайдено"
+  },
+  "multipleLocationsFound": {
+    "message": "Знайдено декілька населених пунктів"
+  },
+  "selectCorrectLocation": {
+    "message": "Оберіть потрібний варіант"
+  },
+  "unableToLoadMap": {
+    "message": "Не вдалося завантажити карту"
+  },
+  "checkPlaceNameOrAddress": {
+    "message": "Перевірте назву або адресу"
+  },
+  "address": {
+    "message": "Адреса"
+  },
+  "coordinates": {
+    "message": "Координати"
+  },
+  "searching": {
+    "message": "Пошук..."
+  },
+  "loadingMap": {
+    "message": "Завантаження карти..."
+  },
+  "enterPlace": {
+    "message": "Введіть селище, місто, село або адресу"
+  },
+  "selectedTextEmpty": {
+    "message": "Спершу виділіть назву місця або адресу"
+  },
+  "addressCopied": {
+    "message": "Адресу скопійовано"
+  },
+  "coordinatesCopied": {
+    "message": "Координати скопійовано"
+  },
+  "copyFailed": {
+    "message": "Не вдалося скопіювати"
+  },
+  "mapAttribution": {
+    "message": "Дані карти © учасники OpenStreetMap"
+  },
+  "saveAutomatically": {
+    "message": "Зміни зберігаються автоматично"
+  },
+  "appearance": {
+    "message": "Вигляд"
+  },
+  "locationPreferences": {
+    "message": "Параметри локації"
+  },
+  "countryPlaceholder": {
+    "message": "Наприклад: Україна"
+  },
+  "regionPlaceholder": {
+    "message": "Наприклад: Львівська область"
+  },
+  "cityPlaceholder": {
+    "message": "Наприклад: Київ"
+  },
+  "languageUk": {
+    "message": "Українська"
+  },
+  "languageEn": {
+    "message": "English"
+  },
+  "settingsIntro": {
+    "message": "Налаштуйте MapLocate для місць, які шукаєте найчастіше."
+  },
+  "openSettings": {
+    "message": "Відкрити налаштування"
+  },
+  "suggestions": {
+    "message": "Пропозиції"
+  },
+  "zoomIn": {
+    "message": "Наблизити"
+  },
+  "zoomOut": {
+    "message": "Віддалити"
+  },
+  "clearSearch": {
+    "message": "Очистити пошук"
+  },
+  "cancel": {
+    "message": "Скасувати"
+  },
+  "close": {
+    "message": "Закрити"
+  }
+}

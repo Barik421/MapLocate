@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main class="settings-shell">
+      <header class="settings-header">
+        <div class="brand">
+          <span class="brand-mark"></span>
+          <span class="brand-name" data-i18n="extensionName"></span>
+        </div>
+        <p data-i18n="settingsIntro"></p>
+      </header>
+
+      <form class="settings-form" id="settingsForm">
+        <section class="settings-card">
+          <h2 data-i18n="appearance"></h2>
+          <label class="field">
+            <span data-i18n="language"></span>
+            <select id="languageSelect" name="language">
+              <option value="uk" data-i18n="languageUk"></option>
+              <option value="en" data-i18n="languageEn"></option>
+            </select>
+          </label>
+          <label class="field">
+            <span data-i18n="theme"></span>
+            <select id="themeSelect" name="theme">
+              <option value="system" data-i18n="system"></option>
+              <option value="light" data-i18n="light"></option>
+              <option value="dark" data-i18n="dark"></option>
+            </select>
+          </label>
+        </section>
+
+        <section class="settings-card">
+          <h2 data-i18n="locationPreferences"></h2>
+          <label class="field">
+            <span data-i18n="defaultCountry"></span>
+            <input id="defaultCountry" name="defaultCountry" type="text" autocomplete="country-name" data-i18n-placeholder="countryPlaceholder">
+          </label>
+          <label class="field">
+            <span data-i18n="preferredRegion"></span>
+            <input id="preferredRegion" name="preferredRegion" type="text" data-i18n-placeholder="regionPlaceholder">
+          </label>
+          <label class="field">
+            <span data-i18n="referenceCity"></span>
+            <input id="referenceCity" name="referenceCity" type="text" data-i18n-placeholder="cityPlaceholder">
+          </label>
+        </section>
+      </form>
+
+      <p class="save-note" data-i18n="saveAutomatically"></p>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
