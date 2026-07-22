@@ -279,31 +279,20 @@ function showQuickInfo(info, anchorRect = null) {
   popover.style.left = `${Math.max(margin, left)}px`;
 }
 
-function isMapLocateUiEvent(event) {
-  const path = event.composedPath?.() || [];
-  return path.some((node) => (
-    node instanceof Element
-    && (node.id === BUTTON_ID || node.id === POPOVER_ID || node.id === BACKDROP_ID)
-  ));
-}
-
-function closeUiFromOutside(event) {
-  if (isMapLocateUiEvent(event)) {
-    return;
-  }
-
-  if (document.getElementById(POPOVER_ID) || selectionButton) {
-    clearSelectionUi();
-  }
-}
-
 document.addEventListener("selectionchange", () => {
   clearTimeout(hideTimer);
   setTimeout(showButton, 80);
 });
 
-document.addEventListener("pointerdown", closeUiFromOutside, true);
-document.addEventListener("click", closeUiFromOutside, true);
+document.addEventListener("mouseup", () => {
+  clearTimeout(hideTimer);
+  setTimeout(showButton, 40);
+});
+
+document.addEventListener("touchend", () => {
+  clearTimeout(hideTimer);
+  setTimeout(showButton, 120);
+}, { passive: true });
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
