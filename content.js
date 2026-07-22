@@ -71,14 +71,14 @@ function selectionRect() {
 }
 
 function placeButton(rect) {
-  const top = Math.max(8, window.scrollY + rect.top - 44);
+  const top = Math.max(8, rect.top - 44);
   const left = Math.min(
-    window.scrollX + rect.left,
-    window.scrollX + document.documentElement.clientWidth - 154
+    rect.left,
+    document.documentElement.clientWidth - 154
   );
 
   selectionButton.style.top = `${top}px`;
-  selectionButton.style.left = `${Math.max(window.scrollX + 8, left)}px`;
+  selectionButton.style.left = `${Math.max(8, left)}px`;
 }
 
 function createButton() {
@@ -197,13 +197,42 @@ function showQuickInfo(info, anchorRect = null) {
   document.documentElement.append(popover);
 
   const rect = anchorRect || selectionRect();
-  const top = Math.max(8, window.scrollY + (rect?.bottom || 24) + 10);
+  const gap = 10;
+  const margin = 8;
+  const viewportHeight = document.documentElement.clientHeight;
+  const viewportWidth = document.documentElement.clientWidth;
+  const popoverRect = popover.getBoundingClientRect();
+  const anchorTop = rect?.top ?? margin;
+  const anchorBottom = rect?.bottom ?? margin;
+  const belowTop = anchorBottom + gap;
+  const aboveTop = anchorTop - popoverRect.height - gap;
+  const top = belowTop + popoverRect.height <= viewportHeight - margin
+    ? belowTop
+    : Math.max(margin, aboveTop);
   const left = Math.min(
-    window.scrollX + (rect?.left || 12),
-    window.scrollX + document.documentElement.clientWidth - 326
+    rect?.left || 12,
+    viewportWidth - popoverRect.width - margin
   );
   popover.style.top = `${top}px`;
-  popover.style.left = `${Math.max(window.scrollX + 8, left)}px`;
+  popover.style.left = `${Math.max(margin, left)}px`;
+}
+
+function isMapLocateUiEvent(event) {
+  const path = event.composedPath?.() || [];
+  return path.some((node) => (
+    node instanceof Element
+    && (node.id === BUTTON_ID || node.id === POPOVER_ID)
+  ));
+}
+
+function closeUiFromOutside(event) {
+  if (isMapLocateUiEvent(event)) {
+    return;
+  }
+
+  if (document.getElementById(POPOVER_ID) || selectionButton || getSelectedText()) {
+    clearSelectionUi();
+  }
 }
 
 document.addEventListener("selectionchange", () => {
@@ -211,15 +240,8 @@ document.addEventListener("selectionchange", () => {
   setTimeout(showButton, 80);
 });
 
-document.addEventListener("pointerdown", (event) => {
-  if (event.target.closest(`#${BUTTON_ID}, #${POPOVER_ID}`)) {
-    return;
-  }
-
-  if (document.getElementById(POPOVER_ID) || selectionButton || getSelectedText()) {
-    clearSelectionUi();
-  }
-}, true);
+document.addEventListener("pointerdown", closeUiFromOutside, true);
+document.addEventListener("click", closeUiFromOutside, true);
 
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
@@ -227,17 +249,9 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-window.addEventListener("scroll", () => {
-  if (!selectionButton) {
-    return;
-  }
-  const rect = selectionRect();
-  if (rect) {
-    placeButton(rect);
-  }
-}, { passive: true });
+window.addEventListener("scroll", clearSelectionUi, { passive: true });
 
-window.addEventListener("resize", removeButton);
+window.addEventListener("resize", clearSelectionUi);
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "MAPLOCATE_QUICK_INFO") {
