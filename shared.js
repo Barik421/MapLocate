@@ -5,7 +5,7 @@ const STORAGE_DEFAULTS = {
   preferredRegion: "",
   referenceCity: "",
   selectionButtonEnabled: true,
-  selectionActionMode: "sidePanel"
+  selectionActionMode: "quickInfo"
 };
 
 let cachedMessages = null;

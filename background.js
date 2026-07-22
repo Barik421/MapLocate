@@ -20,7 +20,8 @@ async function seedInstallDefaults(details) {
     return;
   }
   await chrome.storage.sync.set({
-    selectionButtonEnabled: true
+    selectionButtonEnabled: true,
+    selectionActionMode: "quickInfo"
   });
 }
 
