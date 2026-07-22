@@ -29,7 +29,7 @@ Telegram: `@barik_superman`
 - No remote script tags are used.
 - No `eval()` or dynamic remote code execution is used by MapLocate source files.
 - Ukrainian and English locale keys are aligned.
-- Permissions are limited to context menus, side panel, storage, content-script access, Nominatim, and OpenStreetMap tiles.
+- Permissions are limited to context menus, scripting for already-open tabs, side panel, storage, content-script access, Nominatim, and OpenStreetMap tiles.
 - Privacy policy draft is included in `PRIVACY.md`.
 - The release zip excludes Git metadata and existing release archives.
 

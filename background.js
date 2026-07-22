@@ -1,6 +1,7 @@
 import { buildSearchQuery, getActiveLanguage, getSettings, loadMessages } from "./shared.js";
 
 const MENU_ID = "maplocate-find";
+const CONTENT_SCRIPT_MARKER = "maplocate-content-script";
 
 async function refreshContextMenu() {
   const language = await getActiveLanguage();
@@ -14,12 +15,54 @@ async function refreshContextMenu() {
   });
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
+async function seedInstallDefaults(details) {
+  if (details.reason !== "install") {
+    return;
+  }
+  await chrome.storage.sync.set({
+    selectionButtonEnabled: true
+  });
+}
+
+function canInjectIntoTab(tab) {
+  return Boolean(tab.id && /^https?:\/\//.test(tab.url || ""));
+}
+
+async function injectContentIntoOpenTabs() {
+  const tabs = await chrome.tabs.query({});
+  await Promise.allSettled(
+    tabs.filter(canInjectIntoTab).map(async (tab) => {
+      const [{ result: alreadyInjected } = {}] = await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (marker) => Boolean(globalThis[marker]),
+        args: [CONTENT_SCRIPT_MARKER]
+      });
+      if (alreadyInjected) {
+        return;
+      }
+      await chrome.scripting.insertCSS({
+        target: { tabId: tab.id },
+        files: ["content.css"]
+      });
+      await chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["content.js"]
+      });
+    })
+  );
+}
+
+chrome.runtime.onInstalled.addListener((details) => {
+  chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true }).catch(() => {});
+  seedInstallDefaults(details).catch(() => {});
   refreshContextMenu();
+  injectContentIntoOpenTabs().catch(() => {});
 });
 
-chrome.runtime.onStartup.addListener(refreshContextMenu);
+chrome.runtime.onStartup.addListener(() => {
+  refreshContextMenu();
+  injectContentIntoOpenTabs().catch(() => {});
+});
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "sync" && changes.language) {

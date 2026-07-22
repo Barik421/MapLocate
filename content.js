@@ -1,3 +1,6 @@
+if (!globalThis["maplocate-content-script"]) {
+  globalThis["maplocate-content-script"] = true;
+
 const BUTTON_ID = "maplocate-selection-button";
 const POPOVER_ID = "maplocate-info-popover";
 const BACKDROP_ID = "maplocate-info-backdrop";
@@ -171,7 +174,7 @@ function createButton() {
 }
 
 function showButton() {
-  if (!settings.selectionButtonEnabled || !hasExtensionContext()) {
+  if (!settings.selectionButtonEnabled) {
     removeButton();
     return;
   }
@@ -314,4 +317,6 @@ try {
   }
 } catch {
   extensionContextValid = false;
+}
+
 }
