@@ -2,33 +2,84 @@ const BUTTON_ID = "maplocate-selection-button";
 const POPOVER_ID = "maplocate-info-popover";
 const BACKDROP_ID = "maplocate-info-backdrop";
 const MIN_SELECTION_LENGTH = 2;
+const FALLBACK_MESSAGES = {
+  close: "Close",
+  findOnMap: "Find on map",
+  openInGoogleMaps: "Open in Google Maps",
+  openInGoogleSearch: "Open in Google",
+  placeInfoUnavailable: "Place information is unavailable",
+  region: "Region",
+  district: "District"
+};
 
 let selectionButton = null;
 let hideTimer = null;
+let extensionContextValid = true;
 let settings = {
   selectionButtonEnabled: true,
   selectionActionMode: "sidePanel"
 };
 
-chrome.storage.sync.get(settings).then((stored) => {
-  settings = { ...settings, ...stored };
-});
+function hasExtensionContext() {
+  try {
+    return extensionContextValid && Boolean(globalThis.chrome?.runtime?.id);
+  } catch {
+    extensionContextValid = false;
+    return false;
+  }
+}
 
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area !== "sync") {
-    return;
-  }
-  if (changes.selectionButtonEnabled) {
-    settings.selectionButtonEnabled = changes.selectionButtonEnabled.newValue;
-    if (!settings.selectionButtonEnabled) {
-      removeButton();
-      removePopover();
+function getMessage(key) {
+  try {
+    if (hasExtensionContext()) {
+      return globalThis.chrome.i18n.getMessage(key) || FALLBACK_MESSAGES[key] || key;
     }
+  } catch {
+    extensionContextValid = false;
   }
-  if (changes.selectionActionMode) {
-    settings.selectionActionMode = changes.selectionActionMode.newValue;
+  return FALLBACK_MESSAGES[key] || key;
+}
+
+try {
+  if (hasExtensionContext()) {
+    globalThis.chrome.storage.sync.get(settings).then((stored) => {
+      settings = { ...settings, ...stored };
+    }).catch(() => {
+      extensionContextValid = false;
+    });
+
+    globalThis.chrome.storage.onChanged.addListener((changes, area) => {
+      if (area !== "sync") {
+        return;
+      }
+      if (changes.selectionButtonEnabled) {
+        settings.selectionButtonEnabled = changes.selectionButtonEnabled.newValue;
+        if (!settings.selectionButtonEnabled) {
+          removeButton();
+          removePopover();
+        }
+      }
+      if (changes.selectionActionMode) {
+        settings.selectionActionMode = changes.selectionActionMode.newValue;
+      }
+    });
   }
-});
+} catch {
+  extensionContextValid = false;
+}
+
+async function sendRuntimeMessage(message) {
+  try {
+    if (!hasExtensionContext()) {
+      return null;
+    }
+    return await globalThis.chrome.runtime.sendMessage(message);
+  } catch {
+    extensionContextValid = false;
+    clearSelectionUi();
+    return null;
+  }
+}
 
 function getSelectedText() {
   const selection = window.getSelection();
@@ -87,7 +138,7 @@ function createButton() {
   const button = document.createElement("button");
   button.id = BUTTON_ID;
   button.type = "button";
-  button.innerHTML = `<span class="maplocate-selection-pin"></span><span>${chrome.i18n.getMessage("findOnMap")}</span>`;
+  button.innerHTML = `<span class="maplocate-selection-pin"></span><span>${getMessage("findOnMap")}</span>`;
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
     const query = button.dataset.query || getSelectedText();
@@ -96,14 +147,14 @@ function createButton() {
       return;
     }
     try {
-      const response = await chrome.runtime.sendMessage({
+      const response = await sendRuntimeMessage({
         type: "MAPLOCATE_FIND_SELECTION",
         query,
         actionMode: settings.selectionActionMode
       });
       if (!response?.ok && settings.selectionActionMode === "quickInfo") {
         showQuickInfo({
-          title: chrome.i18n.getMessage("placeInfoUnavailable"),
+          title: getMessage("placeInfoUnavailable"),
           region: "",
           district: "",
           mapsUrl: "",
@@ -120,7 +171,7 @@ function createButton() {
 }
 
 function showButton() {
-  if (!settings.selectionButtonEnabled) {
+  if (!settings.selectionButtonEnabled || !hasExtensionContext()) {
     removeButton();
     return;
   }
@@ -149,7 +200,7 @@ function quickInfoRow(labelKey, value) {
   const row = document.createElement("div");
   row.className = "maplocate-info-row";
   const label = document.createElement("span");
-  label.textContent = chrome.i18n.getMessage(labelKey);
+  label.textContent = getMessage(labelKey);
   const text = document.createElement("strong");
   text.textContent = value;
   row.append(label, text);
@@ -164,7 +215,7 @@ function actionLink(labelKey, url) {
   link.href = url;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
-  link.textContent = chrome.i18n.getMessage(labelKey);
+  link.textContent = getMessage(labelKey);
   return link;
 }
 
@@ -173,7 +224,7 @@ function showQuickInfo(info, anchorRect = null) {
   const backdrop = document.createElement("button");
   backdrop.id = BACKDROP_ID;
   backdrop.type = "button";
-  backdrop.setAttribute("aria-label", chrome.i18n.getMessage("close"));
+  backdrop.setAttribute("aria-label", getMessage("close"));
   backdrop.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     clearSelectionUi();
@@ -185,7 +236,7 @@ function showQuickInfo(info, anchorRect = null) {
   const closeButton = document.createElement("button");
   closeButton.className = "maplocate-info-close";
   closeButton.type = "button";
-  closeButton.setAttribute("aria-label", chrome.i18n.getMessage("close"));
+  closeButton.setAttribute("aria-label", getMessage("close"));
   closeButton.textContent = "×";
   closeButton.addEventListener("click", clearSelectionUi);
 
@@ -264,8 +315,14 @@ window.addEventListener("scroll", clearSelectionUi, { passive: true });
 
 window.addEventListener("resize", clearSelectionUi);
 
-chrome.runtime.onMessage.addListener((message) => {
-  if (message?.type === "MAPLOCATE_QUICK_INFO") {
-    showQuickInfo(message.info);
+try {
+  if (hasExtensionContext()) {
+    globalThis.chrome.runtime.onMessage.addListener((message) => {
+      if (message?.type === "MAPLOCATE_QUICK_INFO") {
+        showQuickInfo(message.info);
+      }
+    });
   }
-});
+} catch {
+  extensionContextValid = false;
+}
