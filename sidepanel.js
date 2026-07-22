@@ -14,6 +14,7 @@ const RECENT_LIMIT = 5;
 
 const mapElement = document.querySelector("#map");
 const mapStatus = document.querySelector("#mapStatus");
+const toast = document.querySelector("#toast");
 const results = document.querySelector("#results");
 const searchForm = document.querySelector("#searchForm");
 const searchInput = document.querySelector("#searchInput");
@@ -36,6 +37,7 @@ let suggestions = [];
 let activeSuggestionIndex = -1;
 let suggestAbortController = null;
 let suggestTimer = null;
+let toastTimer = null;
 
 function tileTemplate() {
   return LIGHT_TILE;
@@ -341,6 +343,18 @@ function hideStatus() {
   mapStatus.classList.add("hidden");
 }
 
+function showToast(key, type = "success") {
+  clearTimeout(toastTimer);
+  toast.textContent = messages[key] || key;
+  toast.dataset.type = type;
+  toast.classList.remove("hidden", "visible");
+  requestAnimationFrame(() => toast.classList.add("visible"));
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("visible");
+    toastTimer = setTimeout(() => toast.classList.add("hidden"), 180);
+  }, 1500);
+}
+
 function googleMapsQuery(location) {
   const address = location.address || {};
   const placeName = primaryLocationName(location);
@@ -363,10 +377,9 @@ function directionsUrl(location) {
 async function copyText(value, successKey) {
   try {
     await navigator.clipboard.writeText(value);
-    showStatus(successKey);
-    setTimeout(hideStatus, 1400);
+    showToast(successKey);
   } catch {
-    showStatus("copyFailed");
+    showToast("copyFailed", "error");
   }
 }
 
