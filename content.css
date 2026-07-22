@@ -46,6 +46,19 @@
   background: #ffffff;
 }
 
+#maplocate-info-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
+
 #maplocate-info-popover {
   position: fixed;
   z-index: 2147483647;

@@ -1,5 +1,6 @@
 const BUTTON_ID = "maplocate-selection-button";
 const POPOVER_ID = "maplocate-info-popover";
+const BACKDROP_ID = "maplocate-info-backdrop";
 const MIN_SELECTION_LENGTH = 2;
 
 let selectionButton = null;
@@ -42,6 +43,7 @@ function removeButton() {
 }
 
 function removePopover() {
+  document.getElementById(BACKDROP_ID)?.remove();
   document.getElementById(POPOVER_ID)?.remove();
 }
 
@@ -168,6 +170,15 @@ function actionLink(labelKey, url) {
 
 function showQuickInfo(info, anchorRect = null) {
   removePopover();
+  const backdrop = document.createElement("button");
+  backdrop.id = BACKDROP_ID;
+  backdrop.type = "button";
+  backdrop.setAttribute("aria-label", chrome.i18n.getMessage("close"));
+  backdrop.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    clearSelectionUi();
+  });
+
   const popover = document.createElement("section");
   popover.id = POPOVER_ID;
 
@@ -176,7 +187,7 @@ function showQuickInfo(info, anchorRect = null) {
   closeButton.type = "button";
   closeButton.setAttribute("aria-label", chrome.i18n.getMessage("close"));
   closeButton.textContent = "×";
-  closeButton.addEventListener("click", removePopover);
+  closeButton.addEventListener("click", clearSelectionUi);
 
   const title = document.createElement("h2");
   title.textContent = info.place || info.title;
@@ -194,7 +205,7 @@ function showQuickInfo(info, anchorRect = null) {
   ].filter(Boolean).forEach((link) => actions.append(link));
 
   popover.append(closeButton, title, ...rows, actions);
-  document.documentElement.append(popover);
+  document.documentElement.append(backdrop, popover);
 
   const rect = anchorRect || selectionRect();
   const gap = 10;
@@ -221,7 +232,7 @@ function isMapLocateUiEvent(event) {
   const path = event.composedPath?.() || [];
   return path.some((node) => (
     node instanceof Element
-    && (node.id === BUTTON_ID || node.id === POPOVER_ID)
+    && (node.id === BUTTON_ID || node.id === POPOVER_ID || node.id === BACKDROP_ID)
   ));
 }
 
