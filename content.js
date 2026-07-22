@@ -216,7 +216,7 @@ document.addEventListener("pointerdown", (event) => {
     return;
   }
 
-  if (getSelectedText()) {
+  if (document.getElementById(POPOVER_ID) || selectionButton || getSelectedText()) {
     clearSelectionUi();
   }
 }, true);
