@@ -457,7 +457,6 @@ function renderLocation(location, alternatives = []) {
   const meta = document.createElement("dl");
   meta.className = "meta-list";
   [
-    ["address", location.display_name],
     ["coordinates", coordinates]
   ].forEach(([labelKey, value]) => {
     const row = document.createElement("div");

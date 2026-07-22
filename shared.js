@@ -16,7 +16,7 @@ export async function getSettings() {
   return { ...STORAGE_DEFAULTS, ...stored };
 }
 
-export function detectLanguage(language = navigator.language) {
+export function detectLanguage(language = chrome.i18n?.getUILanguage?.() || navigator.language) {
   return String(language || "").toLowerCase().startsWith("uk") ? "uk" : "en";
 }
 

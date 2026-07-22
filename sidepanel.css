@@ -335,18 +335,18 @@ body {
   overflow-wrap: anywhere;
 }
 
-.meta-row:nth-child(2) .meta-value {
+.meta-row .meta-value {
   font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   font-size: 14px;
   letter-spacing: 0;
 }
 
-.meta-row:nth-child(2) {
+.meta-row {
   width: fit-content;
   max-width: 100%;
 }
 
-.meta-row:nth-child(2) .meta-label {
+.meta-row .meta-label {
   text-transform: none;
   letter-spacing: 0;
   color: var(--text-secondary);
