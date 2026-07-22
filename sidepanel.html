@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title></title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
     <link rel="stylesheet" href="sidepanel.css">
   </head>
   <body>
@@ -45,14 +46,15 @@
         <div id="map" class="map"></div>
         <div class="zoom-controls">
           <button class="map-control" id="zoomInButton" type="button" data-i18n-title="zoomIn">+</button>
+          <button class="map-control recenter-control" id="recenterButton" type="button" data-i18n-title="centerOnMarker">⌖</button>
           <button class="map-control" id="zoomOutButton" type="button" data-i18n-title="zoomOut">-</button>
         </div>
         <div id="mapStatus" class="map-status hidden" data-i18n="loadingMap"></div>
-        <div class="map-attribution" data-i18n="mapAttribution"></div>
       </section>
 
       <section id="results" class="results"></section>
     </main>
+    <script src="vendor/leaflet/leaflet.js"></script>
     <script type="module" src="sidepanel.js"></script>
   </body>
 </html>

@@ -175,5 +175,11 @@
   },
   "placeInfoUnavailable": {
     "message": "Could not find location details"
+  },
+  "centerOnMarker": {
+    "message": "Center on marker"
+  },
+  "recentSearches": {
+    "message": "Recent searches"
   }
 }

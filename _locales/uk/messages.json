@@ -175,5 +175,11 @@
   },
   "placeInfoUnavailable": {
     "message": "Не вдалося знайти дані про місце"
+  },
+  "centerOnMarker": {
+    "message": "Центрувати на мітці"
+  },
+  "recentSearches": {
+    "message": "Останні пошуки"
   }
 }

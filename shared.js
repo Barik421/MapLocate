@@ -26,7 +26,7 @@ export async function getActiveLanguage() {
 }
 
 export async function loadMessages(language) {
-  const activeLanguage = language || await getActiveLanguage();
+  const activeLanguage = language === "uk" || language === "en" ? language : await getActiveLanguage();
   if (cachedMessages && cachedLanguage === activeLanguage) {
     return cachedMessages;
   }
