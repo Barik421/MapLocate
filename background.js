@@ -64,6 +64,41 @@ function normalizeSearchText(value) {
     .trim();
 }
 
+function knownCityProfile(query) {
+  const cleanQuery = normalizeSearchText(query);
+  const profiles = [
+    {
+      aliases: ["львів", "lviv", "lvov", "lwow"],
+      regions: ["львівська область", "lviv oblast"]
+    },
+    {
+      aliases: ["рівне", "rivne", "rovno"],
+      regions: ["рівненська область", "rivne oblast"]
+    },
+    {
+      aliases: ["хмельницький", "khmelnytskyi", "khmelnitsky", "khmelnytskyy"],
+      regions: ["хмельницька область", "khmelnytskyi oblast", "khmelnytskyy oblast"]
+    },
+    {
+      aliases: ["київ", "kyiv", "kiev"],
+      regions: ["місто київ", "kyiv city"]
+    },
+    {
+      aliases: ["харків", "kharkiv", "kharkov"],
+      regions: ["харківська область", "kharkiv oblast"]
+    },
+    {
+      aliases: ["одеса", "odesa", "odessa"],
+      regions: ["одеська область", "odesa oblast", "odessa oblast"]
+    },
+    {
+      aliases: ["дніпро", "dnipro", "dnepr"],
+      regions: ["дніпропетровська область", "dnipropetrovsk oblast"]
+    }
+  ];
+  return profiles.find((profile) => profile.aliases.some((alias) => normalizeSearchText(alias) === cleanQuery)) || null;
+}
+
 function primaryLocationName(location) {
   const address = location.address || {};
   return address.city
@@ -139,6 +174,40 @@ function textIncludesAny(text, aliases) {
   return aliases.some((alias) => cleanText.includes(normalizeSearchText(alias)));
 }
 
+function locationRegionText(location) {
+  const address = location.address || {};
+  return normalizeSearchText([
+    address.state,
+    address.region,
+    address.province,
+    address.state_district,
+    location.display_name
+  ].filter(Boolean).join(" "));
+}
+
+function matchesKnownCityRegion(location, query) {
+  const profile = knownCityProfile(query);
+  if (!profile) {
+    return false;
+  }
+  const regionText = locationRegionText(location);
+  return profile.regions.some((region) => regionText.includes(normalizeSearchText(region)));
+}
+
+function isWrongKnownCityRegion(location, query) {
+  const profile = knownCityProfile(query);
+  if (!profile) {
+    return false;
+  }
+  const address = location.address || {};
+  const country = normalizeSearchText(address.country || "");
+  const hasKnownCityName = textIncludesAny(primaryLocationName(location), profile.aliases)
+    || textIncludesAny(location.display_name, profile.aliases);
+  return hasKnownCityName
+    && (country.includes("україна") || country.includes("ukraine") || normalizeSearchText(location.display_name).includes("україна"))
+    && !matchesKnownCityRegion(location, query);
+}
+
 function isKnownMajorCityResult(location, query) {
   const cleanQuery = normalizeSearchText(query);
   const address = location.address || {};
@@ -155,12 +224,12 @@ function isKnownMajorCityResult(location, query) {
   }
 
   if (aliases.some((alias) => cityName === normalizeSearchText(alias) || primaryName === normalizeSearchText(alias))) {
-    return true;
+    return !knownCityProfile(query) || matchesKnownCityRegion(location, query);
   }
 
   const hasCityInName = textIncludesAny(displayName, aliases) || textIncludesAny(primaryName, aliases);
   const hasCityContext = textIncludesAny(state, aliases) || textIncludesAny(municipality, aliases) || displayName.includes("city council") || displayName.includes("міська громада");
-  return hasCityInName && hasCityContext;
+  return hasCityInName && (hasCityContext || matchesKnownCityRegion(location, query));
 }
 
 function locationScore(location, query) {
@@ -183,6 +252,8 @@ function locationScore(location, query) {
   if (location.address?.city || location.address?.town) score += 260;
   if (location.address?.village || location.address?.hamlet) score -= 140;
   if (isKnownMajorCityResult(location, query)) score += 1200;
+  if (matchesKnownCityRegion(location, query)) score += 2600;
+  if (isWrongKnownCityRegion(location, query)) score -= 3200;
   return score;
 }
 

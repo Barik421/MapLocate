@@ -39,5 +39,7 @@ Those services process data according to their own privacy policies.
 
 ## Contact
 
-For questions about this policy, use the support contact configured in the Chrome Web Store listing.
+For privacy questions, bugs, suggestions, or feedback, contact:
 
+- Email: `mbrnvwork@gmail.com`
+- Telegram: `@barik_superman`

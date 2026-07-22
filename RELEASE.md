@@ -16,6 +16,12 @@ MapLocate helps you quickly locate places from any web page. Select a city, vill
 
 MapLocate supports Ukrainian and English interface languages, light and dark themes, search suggestions, recent searches, Google Maps actions, and quick coordinate copying.
 
+Support contact:
+
+Email: `mbrnvwork@gmail.com`
+
+Telegram: `@barik_superman`
+
 ## Release Checklist
 
 - Manifest V3 is used.
@@ -45,4 +51,3 @@ MapLocate supports Ukrainian and English interface languages, light and dark the
 ## Known Follow-Up
 
 The location-ranking logic is duplicated between `background.js` and `sidepanel.js`. It is acceptable for this release candidate, but should be extracted into a shared module before larger search-ranking changes.
-

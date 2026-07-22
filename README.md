@@ -19,6 +19,13 @@ MapLocate does not run its own tracking or analytics service. Search text is sen
 
 See [PRIVACY.md](PRIVACY.md) for the full privacy policy draft.
 
+## Contact
+
+For bugs, suggestions, or feedback, contact:
+
+- Email: `mbrnvwork@gmail.com`
+- Telegram: `@barik_superman`
+
 ## Local Development
 
 1. Open `chrome://extensions`.
@@ -37,4 +44,3 @@ zip -r MapLocate-1.0.0.zip . -x "*.git*" "MapLocate-*.zip"
 ```
 
 Upload the generated zip to the Chrome Web Store Developer Dashboard.
-
