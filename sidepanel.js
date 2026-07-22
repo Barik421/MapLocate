@@ -314,7 +314,6 @@ function stateCard(titleKey, bodyKey) {
   body.textContent = messages[bodyKey] || bodyKey;
   card.append(title, body);
   results.replaceChildren(card);
-  renderRecentSearches();
 }
 
 async function recentLocations() {
@@ -336,28 +335,6 @@ async function saveRecentLocation(location) {
   const existing = await recentLocations();
   const next = [item, ...existing.filter((saved) => !sameLocation(saved, item))].slice(0, RECENT_LIMIT);
   await chrome.storage.local.set({ recentLocations: next });
-}
-
-function renderRecentSearches() {
-  recentLocations().then((recent) => {
-    if (!recent.length || currentLocation) return;
-    const card = document.createElement("article");
-    card.className = "recent-card";
-    const title = document.createElement("h3");
-    title.textContent = messages.recentSearches;
-    const list = document.createElement("div");
-    list.className = "recent-list";
-    recent.forEach((location) => {
-      const button = document.createElement("button");
-      button.className = "recent-option";
-      button.type = "button";
-      button.textContent = primaryLocationName(location);
-      button.addEventListener("click", () => renderLocation(location, recent));
-      list.append(button);
-    });
-    card.append(title, list);
-    results.append(card);
-  });
 }
 
 function renderAlternatives(selectedLocation, alternatives) {
@@ -450,7 +427,14 @@ function hideSuggestions() {
   activeSuggestionIndex = -1;
 }
 
-function renderSuggestions(locations) {
+function chooseSuggestion(location, alternatives = []) {
+  searchInput.value = primaryLocationName(location);
+  updateClearButton();
+  hideSuggestions();
+  renderLocation(location, alternatives);
+}
+
+function renderSuggestionList(locations, mode = "search") {
   suggestions = locations.slice(0, 6);
   activeSuggestionIndex = -1;
   suggestionsElement.replaceChildren();
@@ -460,25 +444,40 @@ function renderSuggestions(locations) {
     return;
   }
 
+  if (mode === "recent") {
+    const title = document.createElement("div");
+    title.className = "suggestions-title";
+    title.textContent = messages.recentSearches;
+    suggestionsElement.append(title);
+  }
+
   suggestions.forEach((location, index) => {
     const option = document.createElement("button");
-    option.className = "suggestion-option";
+    option.className = `suggestion-option ${mode === "recent" ? "recent-suggestion" : ""}`;
     option.id = `suggestion-${index}`;
     option.type = "button";
     option.role = "option";
-    option.textContent = location.display_name;
+    const name = document.createElement("strong");
+    name.textContent = primaryLocationName(location);
+    const subtitle = document.createElement("span");
+    subtitle.textContent = locationSubtitle(location) || location.display_name;
+    option.append(name, subtitle);
     option.addEventListener("mousedown", (event) => event.preventDefault());
-    option.addEventListener("click", () => {
-      searchInput.value = primaryLocationName(location);
-      updateClearButton();
-      hideSuggestions();
-      renderLocation(location);
-    });
+    option.addEventListener("click", () => chooseSuggestion(location, suggestions));
     suggestionsElement.append(option);
   });
 
   suggestionsElement.classList.remove("hidden");
   searchInput.setAttribute("aria-expanded", "true");
+}
+
+function renderSuggestions(locations) {
+  renderSuggestionList(locations, "search");
+}
+
+async function showRecentSuggestions() {
+  if (searchInput.value.trim()) return;
+  renderSuggestionList(await recentLocations(), "recent");
 }
 
 function updateActiveSuggestion(nextIndex) {
@@ -523,7 +522,12 @@ async function fetchSuggestions(query) {
 
 function scheduleSuggestions() {
   clearTimeout(suggestTimer);
-  suggestTimer = setTimeout(() => fetchSuggestions(searchInput.value), 260);
+  const query = searchInput.value.trim();
+  if (!query) {
+    showRecentSuggestions();
+    return;
+  }
+  suggestTimer = setTimeout(() => fetchSuggestions(query), 260);
 }
 
 function updateClearButton() {
@@ -613,6 +617,12 @@ searchInput.addEventListener("input", () => {
   scheduleSuggestions();
 });
 
+searchInput.addEventListener("focus", () => {
+  if (!searchInput.value.trim()) {
+    showRecentSuggestions();
+  }
+});
+
 clearSearchButton.addEventListener("click", () => {
   searchInput.value = "";
   currentLocation = null;
@@ -636,10 +646,7 @@ searchInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter" && activeSuggestionIndex >= 0) {
     event.preventDefault();
     const location = suggestions[activeSuggestionIndex];
-    searchInput.value = primaryLocationName(location);
-    updateClearButton();
-    hideSuggestions();
-    renderLocation(location);
+    chooseSuggestion(location, suggestions);
   }
   if (event.key === "Escape") hideSuggestions();
 });
