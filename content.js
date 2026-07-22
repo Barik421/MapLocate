@@ -241,7 +241,7 @@ function closeUiFromOutside(event) {
     return;
   }
 
-  if (document.getElementById(POPOVER_ID) || selectionButton || getSelectedText()) {
+  if (document.getElementById(POPOVER_ID) || selectionButton) {
     clearSelectionUi();
   }
 }
