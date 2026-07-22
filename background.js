@@ -77,6 +77,10 @@ function primaryLocationName(location) {
     || String(location.display_name || "").split(",")[0];
 }
 
+function languageForQuery(query) {
+  return /[А-Яа-яІіЇїЄєҐґ]/.test(query) ? "uk" : getActiveLanguage();
+}
+
 function knownCityScore(name) {
   const scores = {
     "київ": 5000, "kyiv": 5000, "kiev": 5000,
@@ -107,6 +111,34 @@ function knownCityScore(name) {
   return scores[normalizeSearchText(name)] || 0;
 }
 
+function knownCityAliases(query) {
+  const cleanQuery = normalizeSearchText(query);
+  const aliases = {
+    "львів": ["львів", "lviv", "lvov", "lwow"],
+    "lviv": ["львів", "lviv", "lvov", "lwow"],
+    "lvov": ["львів", "lviv", "lvov", "lwow"],
+    "київ": ["київ", "kyiv", "kiev"],
+    "kyiv": ["київ", "kyiv", "kiev"],
+    "kiev": ["київ", "kyiv", "kiev"],
+    "харків": ["харків", "kharkiv", "kharkov"],
+    "kharkiv": ["харків", "kharkiv", "kharkov"],
+    "одеса": ["одеса", "odesa", "odessa"],
+    "odesa": ["одеса", "odesa", "odessa"],
+    "дніпро": ["дніпро", "dnipro", "dnepr"],
+    "dnipro": ["дніпро", "dnipro", "dnepr"],
+    "рівне": ["рівне", "rivne", "rovno"],
+    "rivne": ["рівне", "rivne", "rovno"],
+    "хмельницький": ["хмельницький", "khmelnytskyi", "khmelnitsky"],
+    "khmelnytskyi": ["хмельницький", "khmelnytskyi", "khmelnitsky"]
+  };
+  return aliases[cleanQuery] || (knownCityScore(cleanQuery) ? [cleanQuery] : []);
+}
+
+function textIncludesAny(text, aliases) {
+  const cleanText = normalizeSearchText(text);
+  return aliases.some((alias) => cleanText.includes(normalizeSearchText(alias)));
+}
+
 function isKnownMajorCityResult(location, query) {
   const cleanQuery = normalizeSearchText(query);
   const address = location.address || {};
@@ -115,17 +147,20 @@ function isKnownMajorCityResult(location, query) {
   const state = normalizeSearchText(address.state || address.region || address.province || "");
   const municipality = normalizeSearchText(address.municipality || "");
   const displayName = normalizeSearchText(location.display_name);
-  const cityScore = knownCityScore(cleanQuery);
+  const aliases = knownCityAliases(query);
+  const cityScore = knownCityScore(cleanQuery) || Math.max(...aliases.map(knownCityScore), 0);
 
-  if (!cityScore || primaryName !== cleanQuery) {
+  if (!cityScore || !aliases.length) {
     return false;
   }
 
-  if (cityName === cleanQuery) {
+  if (aliases.some((alias) => cityName === normalizeSearchText(alias) || primaryName === normalizeSearchText(alias))) {
     return true;
   }
 
-  return state.includes(cleanQuery) || municipality.includes(cleanQuery) || displayName.includes(`${cleanQuery} міська громада`);
+  const hasCityInName = textIncludesAny(displayName, aliases) || textIncludesAny(primaryName, aliases);
+  const hasCityContext = textIncludesAny(state, aliases) || textIncludesAny(municipality, aliases) || displayName.includes("city council") || displayName.includes("міська громада");
+  return hasCityInName && hasCityContext;
 }
 
 function locationScore(location, query) {
@@ -135,7 +170,9 @@ function locationScore(location, query) {
   const locationType = normalizeSearchText(location.type);
   const locationClass = normalizeSearchText(location.class);
   const settlementTypes = new Set(["city", "town", "village", "hamlet", "municipality", "suburb", "neighbourhood"]);
-  let score = isKnownMajorCityResult(location, query) ? knownCityScore(cleanQuery) : 0;
+  const aliases = knownCityAliases(query);
+  const cityScore = knownCityScore(cleanQuery) || Math.max(...aliases.map(knownCityScore), 0);
+  let score = isKnownMajorCityResult(location, query) ? cityScore : 0;
 
   if (primaryName === cleanQuery) score += 500;
   if (primaryName.startsWith(cleanQuery)) score += 160;
@@ -145,6 +182,7 @@ function locationScore(location, query) {
   if (locationClass === "boundary" || locationType === "administrative") score -= 420;
   if (location.address?.city || location.address?.town) score += 260;
   if (location.address?.village || location.address?.hamlet) score -= 140;
+  if (isKnownMajorCityResult(location, query)) score += 1200;
   return score;
 }
 
@@ -174,7 +212,7 @@ async function searchBestLocation(query, settings) {
     addressdetails: "1",
     limit: "10",
     dedupe: "1",
-    "accept-language": await getActiveLanguage()
+    "accept-language": await languageForQuery(query)
   });
   const response = await fetch(url);
   if (!response.ok) {

@@ -216,17 +216,27 @@ body {
 }
 
 .maplocate-marker {
+  position: relative;
+  background: transparent;
+  border: 0;
+}
+
+.maplocate-marker-pin {
+  position: absolute;
+  left: 2px;
+  top: 0;
   width: 30px;
   height: 30px;
   border-radius: 50% 50% 50% 8px;
   background: var(--accent);
   transform: rotate(-45deg);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.24);
 }
 
-.maplocate-marker span {
+.maplocate-marker-pin i {
   position: absolute;
   inset: 9px;
+  display: block;
   border-radius: 50%;
   background: #ffffff;
 }
@@ -234,7 +244,10 @@ body {
 .maplocate-marker.pulse::before {
   content: "";
   position: absolute;
-  inset: -8px;
+  left: -4px;
+  top: -6px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--accent-soft);
   animation: marker-pulse 900ms ease-out;
