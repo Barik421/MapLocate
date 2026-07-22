@@ -10,7 +10,6 @@ import {
 } from "./shared.js";
 
 const LIGHT_TILE = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const DARK_TILE = "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png";
 const RECENT_LIMIT = 5;
 
 const mapElement = document.querySelector("#map");
@@ -39,7 +38,7 @@ let suggestAbortController = null;
 let suggestTimer = null;
 
 function tileTemplate() {
-  return activeTheme === "dark" ? DARK_TILE : LIGHT_TILE;
+  return LIGHT_TILE;
 }
 
 function normalizeSearchText(value) {

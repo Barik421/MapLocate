@@ -14,8 +14,7 @@
     "https://tile.openstreetmap.org/*",
     "https://a.tile.openstreetmap.org/*",
     "https://b.tile.openstreetmap.org/*",
-    "https://c.tile.openstreetmap.org/*",
-    "https://tiles.stadiamaps.com/*"
+    "https://c.tile.openstreetmap.org/*"
   ],
   "background": {
     "service_worker": "background.js",
