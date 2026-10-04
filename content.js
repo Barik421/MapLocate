@@ -69,7 +69,7 @@ async function loadContentMessages(language = settings.language) {
     );
     applyLocalizedText();
   } catch {
-    extensionContextValid = false;
+    localizedMessages = { ...FALLBACK_MESSAGES };
   }
 }
 

@@ -38,6 +38,24 @@ for (const file of requiredFiles) {
   assert(fs.existsSync(path.join(root, file)), `Missing required file: ${file}`);
 }
 
+function walkFiles(directory) {
+  return fs.readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const fullPath = path.join(directory, entry.name);
+    const relativePath = path.relative(root, fullPath);
+    if (entry.isDirectory()) {
+      if (entry.name === ".git") {
+        return [];
+      }
+      return walkFiles(fullPath);
+    }
+    return [relativePath];
+  });
+}
+
+const files = walkFiles(root);
+assert(!files.some((file) => path.basename(file) === ".DS_Store"), "Remove .DS_Store files before building release zip");
+assert(!files.some((file) => /^MapLocate-.*\.zip$/.test(path.basename(file))), "Release zip should not be built inside the repository");
+
 const manifest = readJson("manifest.json");
 assert(manifest.manifest_version === 3, "Manifest must use MV3");
 assert(manifest.name === "__MSG_extensionName__", "Manifest name should be localized");
@@ -71,4 +89,3 @@ for (const file of sourceFiles) {
 }
 
 console.log("MapLocate release validation passed.");
-
