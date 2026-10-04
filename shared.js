@@ -1,5 +1,5 @@
 const STORAGE_DEFAULTS = {
-  language: "auto",
+  language: "en",
   theme: "system",
   defaultCountry: "",
   preferredRegion: "",
@@ -13,7 +13,9 @@ let cachedLanguage = null;
 
 export async function getSettings() {
   const stored = await chrome.storage.sync.get(STORAGE_DEFAULTS);
-  return { ...STORAGE_DEFAULTS, ...stored };
+  const settings = { ...STORAGE_DEFAULTS, ...stored };
+  settings.language = settings.language === "uk" ? "uk" : "en";
+  return settings;
 }
 
 export function detectLanguage(language = chrome.i18n?.getUILanguage?.() || navigator.language) {
@@ -22,11 +24,11 @@ export function detectLanguage(language = chrome.i18n?.getUILanguage?.() || navi
 
 export async function getActiveLanguage() {
   const { language } = await getSettings();
-  return language === "uk" || language === "en" ? language : detectLanguage();
+  return language === "uk" ? "uk" : "en";
 }
 
 export async function loadMessages(language) {
-  const activeLanguage = language === "uk" || language === "en" ? language : await getActiveLanguage();
+  const activeLanguage = language === "uk" ? "uk" : language === "en" ? "en" : await getActiveLanguage();
   if (cachedMessages && cachedLanguage === activeLanguage) {
     return cachedMessages;
   }

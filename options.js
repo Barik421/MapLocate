@@ -14,7 +14,7 @@ async function hydrate() {
   await applyTheme(settings.theme);
   await localizeDocument();
 
-  languageSelect.value = settings.language;
+  languageSelect.value = settings.language === "uk" ? "uk" : "en";
   themeSelect.value = settings.theme;
   defaultCountry.value = settings.defaultCountry;
   preferredRegion.value = settings.preferredRegion;
@@ -37,7 +37,7 @@ async function saveForm() {
 
 languageSelect.addEventListener("change", async () => {
   await saveForm();
-  await loadMessages(languageSelect.value === "auto" ? undefined : languageSelect.value);
+  await loadMessages(languageSelect.value);
   await localizeDocument();
 });
 

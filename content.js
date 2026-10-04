@@ -30,12 +30,13 @@ const FALLBACK_MESSAGES = CONTENT_MESSAGES.en;
 let selectionButton = null;
 let hideTimer = null;
 let extensionContextValid = true;
+let selectionRequestActive = false;
 let settings = {
-  language: "auto",
+  language: "en",
   selectionButtonEnabled: true,
   selectionActionMode: "quickInfo"
 };
-let localizedMessages = CONTENT_MESSAGES[detectLanguage()];
+let localizedMessages = CONTENT_MESSAGES.en;
 
 function hasExtensionContext() {
   try {
@@ -65,7 +66,7 @@ function detectLanguage(language = globalThis.chrome?.i18n?.getUILanguage?.() ||
 }
 
 function resolveLanguage(language) {
-  return language === "uk" || language === "en" ? language : detectLanguage();
+  return language === "uk" ? "uk" : "en";
 }
 
 function loadContentMessages(language = settings.language) {
@@ -193,16 +194,18 @@ function createButton() {
   button.append(icon, label);
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
-    if (button.dataset.loading === "true") {
+    if (selectionRequestActive) {
       return;
     }
     const query = button.dataset.query || getSelectedText();
+    const anchorRect = button.getBoundingClientRect();
     if (query.length < MIN_SELECTION_LENGTH) {
       removeButton();
       return;
     }
-    button.dataset.loading = "true";
-    button.disabled = true;
+    selectionRequestActive = true;
+    removeButton();
+    window.getSelection()?.removeAllRanges();
     try {
       const response = await sendRuntimeMessage({
         type: "MAPLOCATE_FIND_SELECTION",
@@ -216,12 +219,10 @@ function createButton() {
           district: "",
           mapsUrl: "",
           googleUrl: ""
-        }, button.getBoundingClientRect());
+        }, anchorRect);
       }
     } finally {
-      button.dataset.loading = "false";
-      button.disabled = false;
-      removeButton();
+      selectionRequestActive = false;
     }
   });
   button.addEventListener("mouseenter", () => clearTimeout(hideTimer));
@@ -230,7 +231,7 @@ function createButton() {
 }
 
 function showButton() {
-  if (!settings.selectionButtonEnabled) {
+  if (!settings.selectionButtonEnabled || selectionRequestActive) {
     removeButton();
     return;
   }
