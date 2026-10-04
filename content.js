@@ -5,25 +5,37 @@ const BUTTON_ID = "maplocate-selection-button";
 const POPOVER_ID = "maplocate-info-popover";
 const BACKDROP_ID = "maplocate-info-backdrop";
 const MIN_SELECTION_LENGTH = 2;
-const FALLBACK_MESSAGES = {
-  close: "Close",
-  findOnMap: "Find on map",
-  openInGoogleMaps: "Open in Google Maps",
-  openInGoogleSearch: "Open in Google",
-  placeInfoUnavailable: "Place information is unavailable",
-  region: "Region",
-  district: "District"
+const CONTENT_MESSAGES = {
+  en: {
+    close: "Close",
+    findOnMap: "Find on map",
+    openInGoogleMaps: "Open in Google Maps",
+    openInGoogleSearch: "Open in Google",
+    placeInfoUnavailable: "Place information is unavailable",
+    region: "Region",
+    district: "District"
+  },
+  uk: {
+    close: "Закрити",
+    findOnMap: "Знайти на карті",
+    openInGoogleMaps: "Відкрити в Google Maps",
+    openInGoogleSearch: "Відкрити в Google",
+    placeInfoUnavailable: "Не вдалося знайти інформацію",
+    region: "Область",
+    district: "Район"
+  }
 };
+const FALLBACK_MESSAGES = CONTENT_MESSAGES.en;
 
 let selectionButton = null;
 let hideTimer = null;
 let extensionContextValid = true;
-let localizedMessages = { ...FALLBACK_MESSAGES };
 let settings = {
   language: "auto",
   selectionButtonEnabled: true,
   selectionActionMode: "quickInfo"
 };
+let localizedMessages = CONTENT_MESSAGES[detectLanguage()];
 
 function hasExtensionContext() {
   try {
@@ -56,21 +68,9 @@ function resolveLanguage(language) {
   return language === "uk" || language === "en" ? language : detectLanguage();
 }
 
-async function loadContentMessages(language = settings.language) {
-  try {
-    if (!hasExtensionContext()) {
-      return;
-    }
-    const activeLanguage = resolveLanguage(language);
-    const response = await fetch(globalThis.chrome.runtime.getURL(`_locales/${activeLanguage}/messages.json`));
-    const rawMessages = await response.json();
-    localizedMessages = Object.fromEntries(
-      Object.entries(rawMessages).map(([key, value]) => [key, value.message])
-    );
-    applyLocalizedText();
-  } catch {
-    localizedMessages = { ...FALLBACK_MESSAGES };
-  }
+function loadContentMessages(language = settings.language) {
+  localizedMessages = CONTENT_MESSAGES[resolveLanguage(language)] || FALLBACK_MESSAGES;
+  applyLocalizedText();
 }
 
 function applyLocalizedText(root = document) {
