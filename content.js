@@ -194,7 +194,7 @@ function createButton() {
   button.append(icon, label);
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
-    if (selectionRequestActive) {
+    if (!hasExtensionContext() || selectionRequestActive) {
       return;
     }
     const query = button.dataset.query || getSelectedText();
@@ -212,7 +212,7 @@ function createButton() {
         query,
         actionMode: settings.selectionActionMode
       });
-      if (!response?.ok && settings.selectionActionMode === "quickInfo") {
+      if (hasExtensionContext() && !response?.ok && settings.selectionActionMode === "quickInfo") {
         showQuickInfo({
           title: getMessage("placeInfoUnavailable"),
           region: "",
@@ -231,7 +231,7 @@ function createButton() {
 }
 
 function showButton() {
-  if (!settings.selectionButtonEnabled || selectionRequestActive) {
+  if (!hasExtensionContext() || !settings.selectionButtonEnabled || selectionRequestActive) {
     removeButton();
     return;
   }
@@ -247,7 +247,15 @@ function showButton() {
     return;
   }
 
+  // Content scripts from different installed copies have separate globals,
+  // but share the page DOM. Do not add another copy of the selection button.
+  if (selectionButton && !selectionButton.isConnected) {
+    selectionButton = null;
+  }
   if (!selectionButton) {
+    if (document.getElementById(BUTTON_ID)) {
+      return;
+    }
     selectionButton = createButton();
     document.documentElement.append(selectionButton);
   }
