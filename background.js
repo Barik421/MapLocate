@@ -16,12 +16,14 @@ async function refreshContextMenu() {
 }
 
 async function seedInstallDefaults(details) {
-  if (details.reason !== "install") {
+  const resetLegacyDefault = details.reason === "update"
+    && /^(?:1\.0\.[01])$/.test(details.previousVersion || "");
+  if (details.reason !== "install" && !resetLegacyDefault) {
     return;
   }
   await chrome.storage.sync.set({
-    selectionButtonEnabled: true,
-    selectionActionMode: "quickInfo"
+    selectionButtonEnabled: false,
+    ...(details.reason === "install" ? { selectionActionMode: "quickInfo" } : {})
   });
 }
 
