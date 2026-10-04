@@ -1,9 +1,9 @@
 {
   "extensionName": {
-    "message": "MapLocate"
+    "message": "Map Locate"
   },
   "extensionDescription": {
-    "message": "MapLocate допомагає швидко знаходити вибрані селища, села, міста й адреси на інтерактивній карті."
+    "message": "Find cities, villages, and addresses from selected text on any website, with a map and quick place details."
   },
   "findOnMap": {
     "message": "Знайти на карті"
@@ -123,7 +123,7 @@
     "message": "Як у Chrome"
   },
   "settingsIntro": {
-    "message": "Налаштуйте MapLocate для місць, які шукаєте найчастіше."
+    "message": "Налаштуйте Map Locate для місць, які шукаєте найчастіше."
   },
   "openSettings": {
     "message": "Відкрити налаштування"
