@@ -193,11 +193,16 @@ function createButton() {
   button.append(icon, label);
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
+    if (button.dataset.loading === "true") {
+      return;
+    }
     const query = button.dataset.query || getSelectedText();
     if (query.length < MIN_SELECTION_LENGTH) {
       removeButton();
       return;
     }
+    button.dataset.loading = "true";
+    button.disabled = true;
     try {
       const response = await sendRuntimeMessage({
         type: "MAPLOCATE_FIND_SELECTION",
@@ -214,6 +219,8 @@ function createButton() {
         }, button.getBoundingClientRect());
       }
     } finally {
+      button.dataset.loading = "false";
+      button.disabled = false;
       removeButton();
     }
   });
@@ -224,6 +231,10 @@ function createButton() {
 
 function showButton() {
   if (!settings.selectionButtonEnabled) {
+    removeButton();
+    return;
+  }
+  if (document.getElementById(POPOVER_ID)) {
     removeButton();
     return;
   }
