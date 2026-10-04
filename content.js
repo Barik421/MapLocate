@@ -31,6 +31,7 @@ let selectionButton = null;
 let hideTimer = null;
 let extensionContextValid = true;
 let selectionRequestActive = false;
+let selectionAnchorRect = null;
 let settings = {
   language: "en",
   selectionButtonEnabled: true,
@@ -199,6 +200,7 @@ function createButton() {
     }
     const query = button.dataset.query || getSelectedText();
     const anchorRect = button.getBoundingClientRect();
+    selectionAnchorRect = anchorRect;
     if (query.length < MIN_SELECTION_LENGTH) {
       removeButton();
       return;
@@ -223,6 +225,7 @@ function createButton() {
       }
     } finally {
       selectionRequestActive = false;
+      selectionAnchorRect = null;
     }
   });
   button.addEventListener("mouseenter", () => clearTimeout(hideTimer));
@@ -384,7 +387,7 @@ try {
   if (hasExtensionContext()) {
     globalThis.chrome.runtime.onMessage.addListener((message) => {
       if (message?.type === "MAPLOCATE_QUICK_INFO") {
-        showQuickInfo(message.info);
+        showQuickInfo(message.info, selectionAnchorRect);
       }
     });
   }
