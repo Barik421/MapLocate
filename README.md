@@ -40,7 +40,7 @@ Run the release checks and create the zip:
 
 ```sh
 node tools/validate-release.mjs
-zip -r MapLocate-1.0.0.zip . -x "*.git*" "MapLocate-*.zip"
+zip -r MapLocate-1.0.0.zip . -x "*.git*" "*.DS_Store" ".gitignore" "MapLocate-*.zip"
 ```
 
 Upload the generated zip to the Chrome Web Store Developer Dashboard.

@@ -18,9 +18,11 @@ const FALLBACK_MESSAGES = {
 let selectionButton = null;
 let hideTimer = null;
 let extensionContextValid = true;
+let localizedMessages = { ...FALLBACK_MESSAGES };
 let settings = {
+  language: "auto",
   selectionButtonEnabled: true,
-  selectionActionMode: "sidePanel"
+  selectionActionMode: "quickInfo"
 };
 
 function hasExtensionContext() {
@@ -33,6 +35,9 @@ function hasExtensionContext() {
 }
 
 function getMessage(key) {
+  if (localizedMessages[key]) {
+    return localizedMessages[key];
+  }
   try {
     if (hasExtensionContext()) {
       return globalThis.chrome.i18n.getMessage(key) || FALLBACK_MESSAGES[key] || key;
@@ -43,10 +48,45 @@ function getMessage(key) {
   return FALLBACK_MESSAGES[key] || key;
 }
 
+function detectLanguage(language = globalThis.chrome?.i18n?.getUILanguage?.() || navigator.language) {
+  return String(language || "").toLowerCase().startsWith("uk") ? "uk" : "en";
+}
+
+function resolveLanguage(language) {
+  return language === "uk" || language === "en" ? language : detectLanguage();
+}
+
+async function loadContentMessages(language = settings.language) {
+  try {
+    if (!hasExtensionContext()) {
+      return;
+    }
+    const activeLanguage = resolveLanguage(language);
+    const response = await fetch(globalThis.chrome.runtime.getURL(`_locales/${activeLanguage}/messages.json`));
+    const rawMessages = await response.json();
+    localizedMessages = Object.fromEntries(
+      Object.entries(rawMessages).map(([key, value]) => [key, value.message])
+    );
+    applyLocalizedText();
+  } catch {
+    extensionContextValid = false;
+  }
+}
+
+function applyLocalizedText(root = document) {
+  root.querySelectorAll("[data-maplocate-i18n]").forEach((node) => {
+    node.textContent = getMessage(node.dataset.maplocateI18n);
+  });
+  root.querySelectorAll("[data-maplocate-i18n-aria]").forEach((node) => {
+    node.setAttribute("aria-label", getMessage(node.dataset.maplocateI18nAria));
+  });
+}
+
 try {
   if (hasExtensionContext()) {
     globalThis.chrome.storage.sync.get(settings).then((stored) => {
       settings = { ...settings, ...stored };
+      loadContentMessages(settings.language);
     }).catch(() => {
       extensionContextValid = false;
     });
@@ -64,6 +104,10 @@ try {
       }
       if (changes.selectionActionMode) {
         settings.selectionActionMode = changes.selectionActionMode.newValue;
+      }
+      if (changes.language) {
+        settings.language = changes.language.newValue;
+        loadContentMessages(settings.language);
       }
     });
   }
@@ -141,7 +185,12 @@ function createButton() {
   const button = document.createElement("button");
   button.id = BUTTON_ID;
   button.type = "button";
-  button.innerHTML = `<span class="maplocate-selection-pin"></span><span>${getMessage("findOnMap")}</span>`;
+  const icon = document.createElement("span");
+  icon.className = "maplocate-selection-pin";
+  const label = document.createElement("span");
+  label.dataset.maplocateI18n = "findOnMap";
+  label.textContent = getMessage("findOnMap");
+  button.append(icon, label);
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
     const query = button.dataset.query || getSelectedText();
@@ -203,6 +252,7 @@ function quickInfoRow(labelKey, value) {
   const row = document.createElement("div");
   row.className = "maplocate-info-row";
   const label = document.createElement("span");
+  label.dataset.maplocateI18n = labelKey;
   label.textContent = getMessage(labelKey);
   const text = document.createElement("strong");
   text.textContent = value;
@@ -218,6 +268,7 @@ function actionLink(labelKey, url) {
   link.href = url;
   link.target = "_blank";
   link.rel = "noopener noreferrer";
+  link.dataset.maplocateI18n = labelKey;
   link.textContent = getMessage(labelKey);
   return link;
 }
@@ -227,6 +278,7 @@ function showQuickInfo(info, anchorRect = null) {
   const backdrop = document.createElement("button");
   backdrop.id = BACKDROP_ID;
   backdrop.type = "button";
+  backdrop.dataset.maplocateI18nAria = "close";
   backdrop.setAttribute("aria-label", getMessage("close"));
   backdrop.addEventListener("pointerdown", (event) => {
     event.preventDefault();
@@ -239,6 +291,7 @@ function showQuickInfo(info, anchorRect = null) {
   const closeButton = document.createElement("button");
   closeButton.className = "maplocate-info-close";
   closeButton.type = "button";
+  closeButton.dataset.maplocateI18nAria = "close";
   closeButton.setAttribute("aria-label", getMessage("close"));
   closeButton.textContent = "×";
   closeButton.addEventListener("click", clearSelectionUi);
