@@ -9,6 +9,11 @@ const referenceCity = document.querySelector("#referenceCity");
 const selectionButtonEnabled = document.querySelector("#selectionButtonEnabled");
 const selectionActionMode = document.querySelector("#selectionActionMode");
 
+let settingsReady = false;
+let saveQueue = Promise.resolve();
+const controls = [...form.querySelectorAll("input, select")];
+controls.forEach((control) => { control.disabled = true; });
+
 async function hydrate() {
   const settings = await getSettings();
   await applyTheme(settings.theme);
@@ -21,10 +26,13 @@ async function hydrate() {
   referenceCity.value = settings.referenceCity;
   selectionButtonEnabled.checked = settings.selectionButtonEnabled;
   selectionActionMode.value = settings.selectionActionMode;
+  settingsReady = true;
+  controls.forEach((control) => { control.disabled = false; });
 }
 
 async function saveForm() {
-  await chrome.storage.sync.set({
+  if (!settingsReady) return;
+  const snapshot = {
     language: languageSelect.value,
     theme: themeSelect.value,
     defaultCountry: defaultCountry.value.trim(),
@@ -32,7 +40,9 @@ async function saveForm() {
     referenceCity: referenceCity.value.trim(),
     selectionButtonEnabled: selectionButtonEnabled.checked,
     selectionActionMode: selectionActionMode.value
-  });
+  };
+  saveQueue = saveQueue.catch(() => {}).then(() => chrome.storage.sync.set(snapshot));
+  await saveQueue;
 }
 
 languageSelect.addEventListener("change", async () => {
