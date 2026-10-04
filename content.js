@@ -34,10 +34,11 @@ let selectionRequestActive = false;
 let selectionAnchorRect = null;
 let settings = {
   language: "en",
-  selectionButtonEnabled: true,
+  selectionButtonEnabled: false,
   selectionActionMode: "quickInfo"
 };
 let localizedMessages = CONTENT_MESSAGES.en;
+const pendingSettingsChanges = {};
 
 function hasExtensionContext() {
   try {
@@ -87,7 +88,11 @@ function applyLocalizedText(root = document) {
 try {
   if (hasExtensionContext()) {
     globalThis.chrome.storage.sync.get(settings).then((stored) => {
-      settings = { ...settings, ...stored };
+      settings = { ...settings, ...stored, ...pendingSettingsChanges };
+      if (!settings.selectionButtonEnabled) {
+        removeButton();
+        removePopover();
+      }
       loadContentMessages(settings.language);
     }).catch(() => {
       extensionContextValid = false;
@@ -96,6 +101,9 @@ try {
     globalThis.chrome.storage.onChanged.addListener((changes, area) => {
       if (area !== "sync") {
         return;
+      }
+      for (const key of Object.keys(settings)) {
+        if (changes[key]) pendingSettingsChanges[key] = changes[key].newValue;
       }
       if (changes.selectionButtonEnabled) {
         settings.selectionButtonEnabled = changes.selectionButtonEnabled.newValue;
@@ -195,7 +203,7 @@ function createButton() {
   button.append(icon, label);
   button.addEventListener("mousedown", (event) => event.preventDefault());
   button.addEventListener("click", async () => {
-    if (!hasExtensionContext() || selectionRequestActive) {
+    if (!hasExtensionContext() || !settings.selectionButtonEnabled || selectionRequestActive) {
       return;
     }
     const query = button.dataset.query || getSelectedText();
@@ -297,6 +305,9 @@ function actionLink(labelKey, url) {
 }
 
 function showQuickInfo(info, anchorRect = null) {
+  if (!hasExtensionContext() || !settings.selectionButtonEnabled) {
+    return;
+  }
   removePopover();
   const backdrop = document.createElement("button");
   backdrop.id = BACKDROP_ID;
