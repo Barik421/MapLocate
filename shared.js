@@ -4,7 +4,7 @@ const STORAGE_DEFAULTS = {
   defaultCountry: "",
   preferredRegion: "",
   referenceCity: "",
-  selectionButtonEnabled: true,
+  selectionButtonEnabled: false,
   selectionActionMode: "quickInfo"
 };
 
